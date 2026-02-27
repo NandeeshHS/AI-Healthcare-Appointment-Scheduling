@@ -2,7 +2,28 @@
 
 > **ML-powered no-show prediction for outpatient clinics — XGBoost + Platt Calibration · ROC-AUC 0.712 · Brier Skill Score +0.112**
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-healthcare-appointment-scheduling.streamlit.app)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://python.org)
+[![XGBoost](https://img.shields.io/badge/XGBoost-3.1-orange)](https://xgboost.readthedocs.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 A full-stack clinical decision-support dashboard built with Python, Streamlit, and XGBoost. It predicts the probability that a booked appointment will result in a no-show or cancellation, explains the prediction with SHAP, and surfaces actionable risk tiers for clinical staff — all backed by a live SQLite database.
+
+---
+
+## Screenshots
+
+| Home Dashboard | Book Appointment |
+|---|---|
+| ![Home](assets/home_dashboard.png) | ![Book](assets/book_appointment.png) |
+
+| Overall Trends | Physician Panel |
+|---|---|
+| ![Trends](assets/overall_view.png) | ![Physician](assets/physician_view.png) |
+
+| Model Performance | My Appointments |
+|---|---|
+| ![Model](assets/model_performance.png) | ![Appointments](assets/my_appointments.png) |
 
 ---
 
@@ -225,6 +246,26 @@ streamlit run app.py
 ```
 
 Open [http://localhost:8501](http://localhost:8501) in your browser.
+
+---
+
+## Deploy to Streamlit Community Cloud (free)
+
+> The app auto-seeds 700 synthetic appointments on first launch — no manual DB setup required.
+
+1. **Fork or push** this repo to your GitHub account.
+2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
+3. Click **New app** → select your repository → set **Main file path** to `app.py`.
+4. Click **Deploy**. Streamlit installs dependencies from `requirements.txt` automatically.
+5. Once live, copy the public URL and update the badge at the top of this README:
+
+```markdown
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](YOUR_APP_URL)
+```
+
+> **Note:** The SQLite database (`healthcare.db`) is gitignored. On every fresh deploy or
+> container restart, `startup.py` recreates it automatically with reproducible synthetic data
+> (seeded with `random.seed(42)`).
 
 ---
 

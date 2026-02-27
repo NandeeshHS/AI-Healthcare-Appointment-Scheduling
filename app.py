@@ -6,7 +6,15 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+_APP_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(_APP_DIR)
+
+# Auto-initialize the database on first run (e.g. Streamlit Community Cloud
+# where healthcare.db is gitignored and does not exist in the deployed repo).
+if not os.path.exists(os.path.join(_APP_DIR, "healthcare.db")):
+    from startup import seed_database
+    seed_database()
+
 from utils import get_all_appointments, render_refresh_button, RISK_COLORS, RISK_ORDER
 
 st.set_page_config(

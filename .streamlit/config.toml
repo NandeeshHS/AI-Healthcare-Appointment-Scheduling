@@ -1,0 +1,16 @@
+[theme]
+# Healthcare blue primary — matches the clinical branding
+primaryColor   = "#2196F3"
+backgroundColor          = "#0e1117"
+secondaryBackgroundColor = "#1a1d2e"
+textColor      = "#f0f2f6"
+font           = "sans serif"
+
+[server]
+# Required for Streamlit Community Cloud (auto-detected but explicit is safer)
+headless     = true
+enableCORS   = false
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false

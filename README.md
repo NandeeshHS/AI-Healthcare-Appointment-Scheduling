@@ -2,28 +2,61 @@
 
 > **ML-powered no-show prediction for outpatient clinics — XGBoost + Platt Calibration · ROC-AUC 0.712 · Brier Skill Score +0.112**
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-healthcare-appointment-scheduling.streamlit.app)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-healthcare-appointment-scheduling-etmkmsyzrrcyduuqwfrhji.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://python.org)
 [![XGBoost](https://img.shields.io/badge/XGBoost-3.1-orange)](https://xgboost.readthedocs.io)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 A full-stack clinical decision-support dashboard built with Python, Streamlit, and XGBoost. It predicts the probability that a booked appointment will result in a no-show or cancellation, explains the prediction with SHAP, and surfaces actionable risk tiers for clinical staff — all backed by a live SQLite database.
 
+**[Live Demo](https://ai-healthcare-appointment-scheduling-etmkmsyzrrcyduuqwfrhji.streamlit.app/)**
+
+---
+
+## Table of Contents
+
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Dashboard Pages](#dashboard-pages)
+- [ML Pipeline](#ml-pipeline)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Installation](#installation)
+- [Deploy to Streamlit Cloud](#deploy-to-streamlit-community-cloud-free)
+- [Retraining the Model](#retraining-the-model)
+- [Key Design Decisions](#key-design-decisions)
+
 ---
 
 ## Screenshots
 
-| Home Dashboard | Book Appointment |
-|---|---|
-| ![Home](assets/home_dashboard.png) | ![Book](assets/book_appointment.png) |
+### Home — Risk Intelligence Dashboard
+![Home Dashboard](assets/home_dashboard.png)
+*Live KPI cards, risk distribution donut chart, upcoming high-risk appointment table, and stacked status overview — refreshed from the live SQLite database.*
 
-| Overall Trends | Physician Panel |
-|---|---|
-| ![Trends](assets/overall_view.png) | ![Physician](assets/physician_view.png) |
+### System Overview
+![System Overview](assets/system_overview.png)
+*End-to-end clinical workflow pipeline, live model metrics, top-10 feature importance chart, risk tier action guide cards, and full tech stack breakdown.*
 
-| Model Performance | My Appointments |
-|---|---|
-| ![Model](assets/model_performance.png) | ![Appointments](assets/my_appointments.png) |
+### Book Appointment — Predict & SHAP Explain
+![Book Appointment](assets/book_appointment.png)
+*Three-section form (patient demographics, appointment details, medical context) feeds the real-time XGBoost + Platt Calibration model. Returns a risk gauge, probability, and SHAP waterfall explanation.*
+
+### Overall View — Fleet-Wide Trends
+![Overall View](assets/overall_view.png)
+*Date-range filter, 5 KPI cards, 7-day rolling risk trend (dual-axis: volume bars + risk line), and interactive appointment calendar heatmap by day of week.*
+
+### Physician Risk View
+![Physician View](assets/physician_view.png)
+*Scatter quadrant (risk rate vs. patient volume) with median dividers, flagged high-volume/high-risk physician callout, and a ranked table with progress bars.*
+
+### Model Performance & Insights
+![Model Performance](assets/model_performance.png)
+*Header metrics (ROC-AUC 0.712, PR-AUC 0.438, Brier Score 0.148, BSS +0.112) with four deep-dive tabs: Probability & ROC · Calibration · Precision-Recall · Features & Thresholds.*
+
+### My Appointments — Search, Filter & Export
+![My Appointments](assets/my_appointments.png)
+*48-hour urgent-attention banner for imminent High/Very High risk appointments, sidebar filters, KPI row with inline CSV export, and full sortable appointment table.*
 
 ---
 
@@ -37,57 +70,60 @@ A full-stack clinical decision-support dashboard built with Python, Streamlit, a
 | **Live Dashboard** | 6 Streamlit pages covering individual bookings, fleet-wide trends, and physician panels |
 | **Calibrated Probabilities** | Platt scaling corrects `scale_pos_weight` overconfidence — predicted 30% ≈ actual 30% NS |
 | **Engineered Features** | Patient & physician historical no-show rates (leakage-free via `shift(1).cumsum()`) |
-| **Synthetic Data Mode** | Populate the DB with 700 realistic historical appointments in one command |
+| **Auto-Seeded Demo Data** | On first run (e.g. Streamlit Cloud), 700 realistic appointments generated automatically |
 
 ---
 
 ## Dashboard Pages
 
-### 🏥 Home — Risk Intelligence Overview
-Live KPI cards (total appointments, high-risk count, avg risk, observed no-show rate), risk distribution donut chart, upcoming high-risk scheduled appointments, and stacked status bar chart.
+### Home — Risk Intelligence Overview
+Live KPI cards (total appointments, high/very-high risk count, avg risk probability, observed no-show rate), a color-coded risk distribution donut chart, an upcoming high-risk appointment table sorted by date, and a stacked appointment status bar chart.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  Total Appts   High/VH Risk   Avg Risk Prob   Observed NS Rate      │
-│    700            183           21.4%             28.2%             │
+│    700            369           28.5%             27.8%             │
 │                                                                     │
 │  [Risk Distribution Donut]     [Upcoming High Risk Table]           │
-│   Very Low 31%                  Patient   Date      Risk   Prob     │
-│   Low      24%                  P84231   Mar 2     High   0.38      │
-│   Moderate 22%                  P10923   Mar 3   V.High   0.52      │
-│   High     14%                  ...                                  │
-│   V.High    9%                                                       │
+│   Very Low  5%                  Patient   Date        Risk   Prob   │
+│   Low       13%                 P24371   Feb 28     V.High   0.54   │
+│   Moderate  25%                 P59735   Mar 2       High   0.37    │
+│   High      31%                 P93320   Mar 2     V.High   0.57    │
+│   V.High    22%                 ...                                  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 📅 Book Appointment — Predict & Book
+### System Overview (How to Use)
+Five-step clinical pipeline diagram, model metrics cards (ROC-AUC, PR-AUC, Brier Skill Score, base rate), top-10 feature importance bar chart, color-coded risk tier action cards with recommended interventions, and tech stack reference.
+
+### Book Appointment — Predict & Book
 Enter patient demographics and appointment details → model predicts in real-time → risk gauge + SHAP waterfall explanation → confirm and save to DB.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│  Patient Info │ Appointment Details │ Medical Context               │
+│  1. Patient Info   2. Appointment Details   3. Medical Context       │
 │                                                                     │
-│              [ 🔮 Predict Risk ]                                    │
+│              [ Predict Risk ]                                       │
 │                                                                     │
 │         ┌──────── Gauge ────────┐                                   │
-│         │      38.2%  🔴        │   Risk Level: HIGH               │
-│         │   No-Show Prob        │   ⚠️ Action Required             │
-│         └──────────────────────┘   Manual outreach + double-book   │
+│         │      38.2%  HIGH      │   Risk Level: HIGH               │
+│         │   No-Show Prob        │   Manual outreach recommended     │
+│         └──────────────────────┘                                   │
 │                                                                     │
 │  Top 5 Risk Factors (SHAP):                                         │
-│  • PATIENT_NOSHOW_RATE (45%): red[Increases Risk] (+0.31)          │
-│  • LEAD_TIME_DAYS (18): red[Increases Risk] (+0.18)                │
-│  • APPT_TYPE_CODE (NP): green[Decreases Risk] (-0.09)              │
+│  • PATIENT_NOSHOW_RATE (+0.31)  Increases Risk                      │
+│  • LEAD_TIME_DAYS (+0.18)       Increases Risk                      │
+│  • APPT_TYPE_CODE (-0.09)       Decreases Risk                      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### 📊 Overall View — Fleet-Wide Trends
-Date-range filter → KPI row → 7-day rolling risk trend (dual-axis: volume bars + risk line) → interactive calendar heatmap (4 metrics) → risk vs. lead-time bubble chart → risk distribution donut + gender box plots → recent appointments table.
+### Overall View — Fleet-Wide Trends
+Date-range filter → 5 KPI cards → 7-day rolling risk trend (dual-axis: volume bars + risk line) → interactive calendar heatmap (4 metrics: count / avg risk / no-show count / no-show rate) → recent appointments table.
 
-### 👨‍⚕️ Physician View — Risk Panel Analysis
-Scatter quadrant (risk rate vs. patient volume, bubble = panel size, quadrant lines at median) → flagged physicians callout → full ranked table with progress bars → individual physician drilldown (KPIs + risk donut + appointment history).
+### Physician View — Risk Panel Analysis
+Scatter quadrant (risk rate vs. patient volume, bubble = panel size, quadrant lines at median values) → flagged physicians callout (above-median volume AND risk rate) → full ranked table with `ProgressColumn` for risk rate → individual physician drilldown via sidebar selector.
 
-### 📈 Model Performance — 4-Tab Deep Dive
+### Model Performance — 4-Tab Deep Dive
 
 | Tab | Contents |
 |---|---|
@@ -96,8 +132,8 @@ Scatter quadrant (risk rate vs. patient volume, bubble = panel size, quadrant li
 | Precision-Recall | PR curve (AUC = 0.438) · F1 vs threshold chart |
 | Features & Thresholds | Top-20 feature importance (XGBoost gain) · 5-tier risk card grid |
 
-### 📋 My Appointments — Search & Filter
-Patient ID search · risk/physician/status/date filters · 48-hour urgent-attention banner for High/VH risk · sortable table · CSV export.
+### My Appointments — Search & Filter
+Patient ID search · risk/physician/status/date sidebar filters · 48-hour urgent-attention banner for High/VH risk · sortable full-width table · inline CSV export.
 
 ---
 
@@ -110,18 +146,18 @@ Raw CSVs (data/)
 Feature Engineering
   • Temporal: LEAD_TIME_DAYS, APPT_DOW (ISO 1-7), APPT_HOUR, IS_WEEKEND, SEASON_BUCKET
   • Historical: PATIENT_NOSHOW_RATE, PHYSICIAN_NOSHOW_RATE (shift+cumsum, no leakage)
-  • Categorical: LabelEncoded (SEX, LANGUAGE, ZIPCODE3, APPT_TYPE_CODE, …)
+  • Categorical: LabelEncoded (SEX, LANGUAGE, ZIPCODE3, APPT_TYPE_CODE, ...)
      │
      ▼
 3-Way Split: 64% train / 16% calibration / 20% test
      │
-     ├─► Optuna TPE (50 trials, StratifiedKFold) → best XGBoost hyperparams
+     ├── Optuna TPE (50 trials, StratifiedKFold) → best XGBoost hyperparams
      │
-     ├─► Base XGBoost fit on train set
-     │         └─► saved as xgboost_base_model.pkl  (used for SHAP)
+     ├── Base XGBoost fit on train set
+     │         └── saved as xgboost_base_model.pkl  (used for SHAP)
      │
-     └─► CalibratedClassifierCV (Platt scaling) fit on calibration set
-               └─► saved as xgboost_model.pkl       (used for predictions)
+     └── CalibratedClassifierCV (Platt scaling) fit on calibration set
+               └── saved as xgboost_model.pkl       (used for predictions)
 ```
 
 ### Model Performance
@@ -140,9 +176,9 @@ Feature Engineering
 |---|---|---|---|
 | Very Low | < 10% | ~7% | No action |
 | Low | 10–15% | ~13% | No action |
-| Moderate | 15–25% | ~19% | Automated SMS/email |
+| Moderate | 15–25% | ~19% | Automated SMS / email reminder |
 | High | 25–40% | ~30% | Manual phone call |
-| Very High | ≥ 40% | ~51% | Double-book + outreach |
+| Very High | ≥ 40% | ~51% | Double-book + personal outreach |
 
 ---
 
@@ -167,10 +203,14 @@ Feature Engineering
 AI-Healthcare-Appointment-Scheduling/
 │
 ├── app.py                          # Streamlit landing page (Home dashboard)
+├── startup.py                      # Auto-seeds DB on first run (cloud deploy)
 ├── utils.py                        # Core ML utilities, DB helpers, design system
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
+│
+├── .streamlit/
+│   └── config.toml                 # Healthcare-blue dark theme
 │
 ├── pages/                          # Streamlit multi-page app
 │   ├── 1_How_to_Use.py             # System Overview (pipeline, metrics, tiers)
@@ -193,6 +233,15 @@ AI-Healthcare-Appointment-Scheduling/
 │   ├── Data_part_b.csv
 │   ├── Data_part_c.csv
 │   └── Data_part_d.csv
+│
+├── assets/                         # Dashboard screenshots (README images)
+│   ├── home_dashboard.png
+│   ├── system_overview.png
+│   ├── book_appointment.png
+│   ├── overall_view.png
+│   ├── physician_view.png
+│   ├── model_performance.png
+│   └── my_appointments.png
 │
 ├── scripts/                        # Utility scripts (run from project root)
 │   ├── extract_model.py            # Train model + export all artifacts
@@ -251,21 +300,15 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ## Deploy to Streamlit Community Cloud (free)
 
-> The app auto-seeds 700 synthetic appointments on first launch — no manual DB setup required.
+> **Auto-seeded:** `startup.py` generates 700 synthetic appointments on first launch — no manual DB setup required.
 
-1. **Fork or push** this repo to your GitHub account.
+1. **Push** this repo to your GitHub account.
 2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
 3. Click **New app** → select your repository → set **Main file path** to `app.py`.
-4. Click **Deploy**. Streamlit installs dependencies from `requirements.txt` automatically.
-5. Once live, copy the public URL and update the badge at the top of this README:
+4. Click **Deploy**. Dependencies from `requirements.txt` install automatically.
+5. Your app goes live at a public URL within a few minutes.
 
-```markdown
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](YOUR_APP_URL)
-```
-
-> **Note:** The SQLite database (`healthcare.db`) is gitignored. On every fresh deploy or
-> container restart, `startup.py` recreates it automatically with reproducible synthetic data
-> (seeded with `random.seed(42)`).
+> **Note:** `healthcare.db` is gitignored (runtime state). On every fresh deploy or container restart, `startup.py` recreates it automatically with reproducible synthetic data (`random.seed(42)`).
 
 ---
 
